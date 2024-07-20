@@ -1,7 +1,65 @@
-import { View, StyleSheet } from "react-native"
-import { Text, Icon, Button } from "react-native-paper"
+import { useState, useCallback, useRef, useEffect } from "react";
+import { View, StyleSheet, Animated } from "react-native"
+import { Text, Icon, Button, Snackbar } from "react-native-paper"
 
 export default () => {
+    const [feedingCount, setFeedingCount] = useState(0);
+    const [snackbarVisible, setSnackbarVisible] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const animatedValue = useRef(new Animated.Value(0)).current;
+
+    const updateFeedingCount = useCallback((step) => {
+        setFeedingCount(prevCount => {
+            const newCount = prevCount + step;
+            if (newCount < 0) {
+                setSnackbarMessage('Cannot go below 0');
+                setSnackbarVisible(true);
+                return prevCount;
+            } else if (newCount > 100) {
+                setSnackbarMessage('Cannot exceed 100');
+                setSnackbarVisible(true);
+                return prevCount;
+            } else {
+                return newCount;
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        Animated.sequence([
+            Animated.timing(animatedValue, {
+                toValue: 1,
+                duration: 75,
+                useNativeDriver: true,
+            }),
+            Animated.timing(animatedValue, {
+                toValue: 0,
+                duration: 75,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [feedingCount]);
+
+    const interpolatedRotateAnimation = animatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg'],
+    });
+
+    const animatedStyle = {
+        transform: [
+            {
+                rotateX: interpolatedRotateAnimation,
+            },
+        ],
+    };
+
+    const onDismissSnackbar = () => setSnackbarVisible(false);
+
+    const formatCount = (value) => {
+        return Number.isInteger(value) ? value.toString() : value.toFixed(1);
+    };
+
+
     return (
         <View style={styles.homeContainer}>
             <View style={[styles.titleContainer]}>
@@ -9,16 +67,47 @@ export default () => {
             </View>
             <View style={[styles.feedingContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineMedium" style={{ fontWeight: 800, marginRight: 5 }}>Feeding</Text>
+                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Feeding</Text>
                     <Icon
                         source="baby-bottle-outline"
                         size={35}
                     />
                 </View>
+                <View style={styles.feedingActionsContainer}>
+                    <Button mode="contained" onPress={() => updateFeedingCount(-1)}
+                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
+                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
+                        -1
+                    </Button>
+                    <Button mode="contained" onPress={() => updateFeedingCount(-0.5)}
+                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
+                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
+                        -0.5
+                    </Button>
+                    <Animated.View style={animatedStyle}>
+                        <Text variant="headlineMedium" style={{
+                            width: 80,
+                            textAlign: 'center',
+                            fontWeight: 'bold'
+                        }}>
+                            {formatCount(feedingCount)}
+                        </Text>
+                    </Animated.View>
+                    <Button mode="contained" onPress={() => updateFeedingCount(0.5)}
+                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
+                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
+                        +0.5
+                    </Button>
+                    <Button mode="contained" onPress={() => updateFeedingCount(1)}
+                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
+                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
+                        +1
+                    </Button>
+                </View>
             </View>
             <View style={[styles.dirtyDiaperContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineMedium" style={{ fontWeight: 800, marginRight: 5 }}>Dirty Diaper</Text>
+                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Dirty Diaper</Text>
                     <Icon
                         source="emoticon-poop"
                         size={35}
@@ -27,7 +116,7 @@ export default () => {
             </View>
             <View style={[styles.wetDiaperContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineMedium" style={{ fontWeight: 800, marginRight: 5 }}>Wet Diaper</Text>
+                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Wet Diaper</Text>
                     <Icon
                         source="weather-rainy"
                         size={35}
@@ -36,13 +125,24 @@ export default () => {
             </View>
             <View style={[styles.sleepContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineMedium" style={{ fontWeight: 800, marginRight: 5 }}>Sleep</Text>
+                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Sleep</Text>
                     <Icon
                         source="sleep"
                         size={35}
                     />
                 </View>
             </View>
+            <Snackbar
+                visible={snackbarVisible}
+                onDismiss={onDismissSnackbar}
+                action={{
+                    label: 'Dismiss',
+                    onPress: onDismissSnackbar,
+                }}
+                duration={3000}
+            >
+                {snackbarMessage}
+            </Snackbar>
         </View>
     )
 }
@@ -72,22 +172,29 @@ const styles = StyleSheet.create({
     feedingContainer: {
         flex: 1,
         paddingTop: 20,
-        paddingLeft: 15
+        paddingHorizontal: 15,
         //backgroundColor: '#b11'
+    },
+    feedingActionsContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        //backgroundColor: '#ccc',
     },
     dirtyDiaperContainer: {
         flex: 1,
-        paddingLeft: 15
+        paddingHorizontal: 15,
         //backgroundColor: '#c11'
     },
     wetDiaperContainer: {
         flex: 1,
-        paddingLeft: 15
+        paddingHorizontal: 15,
         //backgroundColor: '#f12'
     },
     sleepContainer: {
         flex: 1,
-        paddingLeft: 15
+        paddingHorizontal: 15,
         //backgroundColor: '#d33'
     },
     sectionTitle: {
