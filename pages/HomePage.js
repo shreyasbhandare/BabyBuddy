@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { View, StyleSheet, Animated } from "react-native"
-import { Text, Icon, Button, Snackbar } from "react-native-paper"
+import { Text, Icon, Button, Snackbar, useTheme } from "react-native-paper"
 
 export default () => {
+    const { colors } = useTheme();
+
     const [snackbarVisible, setSnackbarVisible] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -159,15 +161,15 @@ export default () => {
 
     return (
         <View style={styles.homeContainer}>
-            <View style={[styles.titleContainer]}>
-                <Text variant="headlineLarge" style={styles.iconContainer}>BabyBuddy</Text>
+            <View style={[styles.titleContainer, { backgroundColor: colors.primary }]}>
+                <Text variant="headlineSmall" style={styles.iconContainer}>BabyBuddy</Text>
             </View>
             <View style={[styles.feedingContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Feeding</Text>
+                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Feeding</Text>
                     <Icon
                         source="baby-bottle-outline"
-                        size={35}
+                        size={30}
                     />
                 </View>
                 <View style={styles.feedingActionsContainer}>
@@ -204,10 +206,10 @@ export default () => {
             </View>
             <View style={[styles.dirtyDiaperContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Dirty Diaper</Text>
+                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Dirty Diaper</Text>
                     <Icon
                         source="emoticon-poop"
-                        size={35}
+                        size={30}
                     />
                 </View>
                 <View style={styles.poopActionsContainer}>
@@ -234,10 +236,10 @@ export default () => {
             </View>
             <View style={[styles.wetDiaperContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Wet Diaper</Text>
+                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Wet Diaper</Text>
                     <Icon
                         source="weather-rainy"
-                        size={35}
+                        size={30}
                     />
                 </View>
                 <View style={styles.peeActionsContainer}>
@@ -264,10 +266,10 @@ export default () => {
             </View>
             <View style={[styles.sleepContainer]}>
                 <View style={styles.sectionTitle}>
-                    <Text variant="headlineSmall" style={{ fontWeight: 800, marginRight: 5 }}>Sleep</Text>
+                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Sleep</Text>
                     <Icon
                         source="sleep"
-                        size={35}
+                        size={30}
                     />
                 </View>
                 <View style={styles.sleepActionsContainer}>
@@ -326,7 +328,6 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         flex: 1,
-        backgroundColor: '#026350',
         flexDirection: 'row',
         paddingLeft: 15
     },
@@ -345,11 +346,10 @@ const styles = StyleSheet.create({
         //backgroundColor: '#b11'
     },
     feedingActionsContainer: {
-        flex: 1,
+        flex: 2,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        //backgroundColor: '#ccc',
     },
     dirtyDiaperContainer: {
         flex: 1,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
         //backgroundColor: '#c11'
     },
     poopActionsContainer: {
-        flex: 1,
+        flex: 2,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
         //backgroundColor: '#f12'
     },
     peeActionsContainer: {
-        flex: 1,
+        flex: 2,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -381,7 +381,7 @@ const styles = StyleSheet.create({
         //backgroundColor: '#d33'
     },
     sleepActionsContainer: {
-        flex: 1,
+        flex: 2,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',

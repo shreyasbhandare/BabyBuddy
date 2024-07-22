@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { BottomNavigation, Text } from 'react-native-paper';
 import HomePage from '../pages/HomePage'
+import SettingsPage from '../pages/SettingsPage';
 
 const HomeRoute = () => <HomePage />
 
 const StatsRoute = () => <Text>Stats</Text>;
 
-const SettingsRoute = () => <Text>Settings</Text>;
+const SettingsRoute = () => <SettingsPage />
 
 const BottomNavbar = () => {
   const [index, setIndex] = useState(0);
