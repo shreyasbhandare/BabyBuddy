@@ -96,17 +96,15 @@ const SettingsPage = () => {
                     style={styles.input}
                 />
             )}
-            {isFormulaFed && (
-                <View>
-                    <Text style={{ fontSize: 16 }}>Feeding Unit</Text>
-                    <RadioButton.Group onValueChange={value => setFeedingUnit(value)} value={feedingUnit}>
-                        <View style={styles.radioContainer}>
-                            <RadioButton.Item label="oz" value="oz" disabled={!isEditing} labelStyle={styles.radioLabel} />
-                            <RadioButton.Item label="ml" value="ml" disabled={!isEditing} labelStyle={styles.radioLabel} />
-                        </View>
-                    </RadioButton.Group>
-                </View>
-            )}
+            <View>
+                <Text style={{ fontSize: 16 }}>Feeding Unit</Text>
+                <RadioButton.Group onValueChange={value => setFeedingUnit(value)} value={feedingUnit}>
+                    <View style={styles.radioContainer}>
+                        <RadioButton.Item label="oz" value="oz" disabled={!isEditing} labelStyle={styles.radioLabel} />
+                        <RadioButton.Item label="ml" value="ml" disabled={!isEditing} labelStyle={styles.radioLabel} />
+                    </View>
+                </RadioButton.Group>
+            </View>
             {isEditing ? (
                 <Button mode="contained" onPress={handleSave} style={styles.button} labelStyle={{ fontSize: 18 }}>
                     Save

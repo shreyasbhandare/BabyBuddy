@@ -10,12 +10,15 @@ export default () => {
 
     const [feedingCount, setFeedingCount] = useState(0);
     const animatedValue = useRef(new Animated.Value(0)).current;
-    
+
     const [poopDiaperCount, setPoopDiaperCount] = useState(0);
     const poopAnimatedValue = useRef(new Animated.Value(0)).current;
 
     const [wetDiaperCount, setWetDiaperCount] = useState(0);
     const wetAnimatedValue = useRef(new Animated.Value(0)).current;
+
+    const [sleepCount, setSleepCount] = useState(0);
+    const sleepAnimatedValue = useRef(new Animated.Value(0)).current;
 
     const updateFeedingCount = useCallback((step) => {
         setFeedingCount(prevCount => {
@@ -60,6 +63,23 @@ export default () => {
                 return prevCount;
             } else if (newCount > 30) {
                 setSnackbarMessage('Cannot exceed 30');
+                setSnackbarVisible(true);
+                return prevCount;
+            } else {
+                return newCount;
+            }
+        });
+    }, []);
+
+    const updateSleepCount = useCallback((step) => {
+        setSleepCount(prevCount => {
+            const newCount = prevCount + step;
+            if (newCount < 0) {
+                setSnackbarMessage('Cannot go below 0');
+                setSnackbarVisible(true);
+                return prevCount;
+            } else if (newCount > 24) {
+                setSnackbarMessage('Cannot exceed 24');
                 setSnackbarVisible(true);
                 return prevCount;
             } else {
@@ -152,12 +172,47 @@ export default () => {
         ],
     };
 
+    useEffect(() => {
+        Animated.sequence([
+            Animated.timing(sleepAnimatedValue, {
+                toValue: 1,
+                duration: 75,
+                useNativeDriver: true,
+            }),
+            Animated.timing(sleepAnimatedValue, {
+                toValue: 0,
+                duration: 75,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [sleepCount]);
+
+    const sleepRotateAnimation = sleepAnimatedValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '180deg'],
+    });
+
+    const sleepAnimatedStyle = {
+        transform: [
+            {
+                rotateX: sleepRotateAnimation,
+            },
+        ],
+    };
+
     const onDismissSnackbar = () => setSnackbarVisible(false);
 
     const formatCount = (value) => {
         return Number.isInteger(value) ? value.toString() : value.toFixed(1);
     };
 
+    const handleSync = () => {
+        console.log("handle sync");
+        setFeedingCount(0);
+        setPoopDiaperCount(0);
+        setWetDiaperCount(0);
+        setSleepCount(0);
+    }
 
     return (
         <View style={styles.homeContainer}>
@@ -273,36 +328,41 @@ export default () => {
                     />
                 </View>
                 <View style={styles.sleepActionsContainer}>
-                    <Button mode="contained" onPress={() => updateFeedingCount(-1)}
+                    <Button mode="contained" onPress={() => updateSleepCount(-1)}
                         labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
                         contentStyle={{ width: 60, height: 60, paddingLeft: 0 }} >
                         -4Hr
                     </Button>
-                    <Button mode="contained" onPress={() => updateFeedingCount(-0.5)}
+                    <Button mode="contained" onPress={() => updateSleepCount(-0.5)}
                         labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
                         contentStyle={{ width: 80, height: 60, paddingLeft: 0 }} >
                         -30min
                     </Button>
-                    <Animated.View style={animatedStyle}>
+                    <Animated.View style={sleepAnimatedStyle}>
                         <Text variant="headlineMedium" style={{
                             width: 80,
                             textAlign: 'center',
                             fontWeight: 'bold'
                         }}>
-                            {formatCount(feedingCount)}
+                            {formatCount(sleepCount)}
                         </Text>
                     </Animated.View>
-                    <Button mode="contained" onPress={() => updateFeedingCount(0.5)}
+                    <Button mode="contained" onPress={() => updateSleepCount(0.5)}
                         labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
                         contentStyle={{ width: 80, height: 60, paddingLeft: 0 }} >
                         +30min
                     </Button>
-                    <Button mode="contained" onPress={() => updateFeedingCount(1)}
+                    <Button mode="contained" onPress={() => updateSleepCount(1)}
                         labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
                         contentStyle={{ width: 60, height: 60, paddingLeft: 0 }} >
                         +4Hr
                     </Button>
                 </View>
+            </View>
+            <View style={styles.syncContainer}>
+                <Button icon="database-sync-outline" mode="contained" onPress={handleSync} style={styles.syncButton} labelStyle={{ fontSize: 18 }}>
+                    Sync
+                </Button>
             </View>
             <Snackbar
                 visible={snackbarVisible}
@@ -387,8 +447,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         //backgroundColor: '#ccc',
     },
+    syncContainer: {
+        marginBottom: 15,
+        paddingHorizontal: 30 
+    },
     sectionTitle: {
         flex: 1,
         flexDirection: 'row'
-    }
+    },
+    syncButton: {
+        marginTop: 16
+    },
 })
