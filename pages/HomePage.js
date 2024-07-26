@@ -20,6 +20,8 @@ export default () => {
     const [sleepCount, setSleepCount] = useState(0);
     const sleepAnimatedValue = useRef(new Animated.Value(0)).current;
 
+    const [feedingUnit, setFeedingUnit] = useState("Oz");
+
     const updateFeedingCount = useCallback((step) => {
         setFeedingCount(prevCount => {
             const newCount = prevCount + step;
@@ -238,15 +240,23 @@ export default () => {
                         contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
                         -0.5
                     </Button>
-                    <Animated.View style={animatedStyle}>
-                        <Text variant="headlineMedium" style={{
-                            width: 80,
+                    <View>
+                        <Animated.View style={animatedStyle}>
+                            <Text variant="headlineMedium" style={{
+                                width: 80,
+                                textAlign: 'center',
+                                fontWeight: 'bold'
+                            }}>
+                                {formatCount(feedingCount)}
+                            </Text>
+                        </Animated.View>
+                        <Text style={{
                             textAlign: 'center',
                             fontWeight: 'bold'
                         }}>
-                            {formatCount(feedingCount)}
+                            {feedingUnit}
                         </Text>
-                    </Animated.View>
+                    </View>
                     <Button mode="contained" onPress={() => updateFeedingCount(0.5)}
                         labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
                         contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
@@ -263,7 +273,7 @@ export default () => {
                 <View style={styles.sectionTitle}>
                     <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Dirty Diaper</Text>
                     <Icon
-                        source="emoticon-poop"
+                        source="emoticon-poop-outline"
                         size={30}
                     />
                 </View>
@@ -293,7 +303,7 @@ export default () => {
                 <View style={styles.sectionTitle}>
                     <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Wet Diaper</Text>
                     <Icon
-                        source="weather-rainy"
+                        source="water-outline"
                         size={30}
                     />
                 </View>
@@ -449,7 +459,7 @@ const styles = StyleSheet.create({
     },
     syncContainer: {
         marginBottom: 15,
-        paddingHorizontal: 30 
+        paddingHorizontal: 30
     },
     sectionTitle: {
         flex: 1,

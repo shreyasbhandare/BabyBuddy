@@ -3,10 +3,11 @@ import { StyleSheet } from 'react-native';
 import { BottomNavigation, Text } from 'react-native-paper';
 import HomePage from '../pages/HomePage'
 import SettingsPage from '../pages/SettingsPage';
+import StatsPage from '../pages/StatsPage';
 
 const HomeRoute = () => <HomePage />
 
-const StatsRoute = () => <Text>Stats</Text>;
+const StatsRoute = () => <StatsPage />
 
 const SettingsRoute = () => <SettingsPage />
 
