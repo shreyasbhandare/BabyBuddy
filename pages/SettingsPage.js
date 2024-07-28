@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import {
     TextInput,
     Switch,
@@ -7,10 +7,14 @@ import {
     Text,
     RadioButton,
     IconButton,
+    useTheme,
+    Divider,
+    Surface,
 } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const SettingsPage = () => {
+    const theme = useTheme();
     const [isEditing, setIsEditing] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -44,123 +48,145 @@ const SettingsPage = () => {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <TextInput
-                label="First Name"
-                value={firstName}
-                onChangeText={setFirstName}
-                disabled={!isEditing}
-                style={styles.input}
-            />
-            <TextInput
-                label="Last Name"
-                value={lastName}
-                onChangeText={setLastName}
-                disabled={!isEditing}
-                style={styles.input}
-            />
-            <View style={styles.dateContainer}>
-                <Text style={styles.labelText}>Birth Date: </Text>
-                <Text style={styles.dateText}>{formatDate(birthDate)}</Text>
-                {isEditing && (
-                    <IconButton
-                        icon="calendar"
-                        size={24}
-                        onPress={() => setShowDatePicker(true)}
-                        style={styles.calendarButton}
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+            <ScrollView>
+                <Surface style={styles.surface}>
+                    <Text variant="titleLarge" style={styles.sectionTitle}>Personal Information</Text>
+                    <TextInput
+                        label="First Name"
+                        value={firstName}
+                        onChangeText={setFirstName}
+                        disabled={!isEditing}
+                        style={styles.input}
+                        mode="outlined"
+                        outlineStyle={{ borderRadius: 10 }}
                     />
-                )}
-            </View>
-            {showDatePicker && (
-                <DateTimePicker
-                    value={birthDate}
-                    mode="date"
-                    display="default"
-                    onChange={onDateChange}
-                />
-            )}
-            <View style={styles.switchContainer}>
-                <Text style={{ fontSize: 16 }}>Formula Fed?</Text>
-                <Switch
-                    value={isFormulaFed}
-                    onValueChange={setIsFormulaFed}
-                    disabled={!isEditing}
-                />
-            </View>
-            {isFormulaFed && (
-                <TextInput
-                    label="Formula Brand/Name"
-                    value={formulaBrand}
-                    onChangeText={setFormulaBrand}
-                    disabled={!isEditing}
-                    style={styles.input}
-                />
-            )}
-            <View>
-                <Text style={{ fontSize: 16 }}>Feeding Unit</Text>
-                <RadioButton.Group onValueChange={value => setFeedingUnit(value)} value={feedingUnit}>
-                    <View style={styles.radioContainer}>
-                        <RadioButton.Item label="oz" value="oz" disabled={!isEditing} labelStyle={styles.radioLabel} />
-                        <RadioButton.Item label="ml" value="ml" disabled={!isEditing} labelStyle={styles.radioLabel} />
+                    <TextInput
+                        label="Last Name"
+                        value={lastName}
+                        onChangeText={setLastName}
+                        disabled={!isEditing}
+                        style={styles.input}
+                        mode="outlined"
+                        outlineStyle={{ borderRadius: 10 }}
+                    />
+                    <View style={styles.dateContainer}>
+                        <Text variant="bodyLarge">Birth Date:</Text>
+                        <Text variant="bodyLarge" style={styles.dateText}>{formatDate(birthDate)}</Text>
+                        {isEditing && (
+                            <IconButton
+                                icon="calendar"
+                                size={24}
+                                onPress={() => setShowDatePicker(true)}
+                                style={styles.calendarButton}
+                            />
+                        )}
                     </View>
-                </RadioButton.Group>
-            </View>
-            {isEditing ? (
-                <Button mode="contained" onPress={handleSave} style={styles.button} labelStyle={{ fontSize: 18 }}>
-                    Save
-                </Button>
-            ) : (
-                <Button mode="outlined" onPress={handleEdit} style={styles.button} labelStyle={{ fontSize: 18 }}>
-                    Edit
-                </Button>
-            )}
-        </ScrollView>
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={birthDate}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                        />
+                    )}
+                </Surface>
+
+                <Surface style={styles.surface}>
+                    <Text variant="titleLarge" style={styles.sectionTitle}>Feeding Preferences</Text>
+                    <View style={styles.switchContainer}>
+                        <Text variant="bodyLarge">Formula Fed?</Text>
+                        <Switch
+                            value={isFormulaFed}
+                            onValueChange={setIsFormulaFed}
+                            disabled={!isEditing}
+                        />
+                    </View>
+                    {isFormulaFed && (
+                        <TextInput
+                            label="Formula Brand/Name"
+                            value={formulaBrand}
+                            onChangeText={setFormulaBrand}
+                            disabled={!isEditing}
+                            style={styles.input}
+                            mode="outlined"
+                            outlineStyle={{ borderRadius: 10 }}
+                        />
+                    )}
+                    <Text variant="bodyLarge" style={styles.feedingUnitTitle}>Feeding Unit</Text>
+                    <RadioButton.Group onValueChange={value => setFeedingUnit(value)} value={feedingUnit}>
+                        <View style={styles.radioContainer}>
+                            <RadioButton.Item label="oz" value="oz" disabled={!isEditing} />
+                            <RadioButton.Item label="ml" value="ml" disabled={!isEditing} />
+                        </View>
+                    </RadioButton.Group>
+                </Surface>
+
+                <View style={styles.buttonContainer}>
+                    {isEditing ? (
+                        <Button mode="contained" onPress={handleSave} style={styles.button}>
+                            Save
+                        </Button>
+                    ) : (
+                        <Button mode="outlined" onPress={handleEdit} style={styles.button}>
+                            Edit
+                        </Button>
+                    )}
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    surface: {
         padding: 16,
-        paddingTop: 64
+        marginHorizontal: 16,
+        marginTop: 16,
+        borderRadius: 8,
+        elevation: 4,
+    },
+    sectionTitle: {
+        marginBottom: 16,
+        fontWeight: 'bold',
     },
     input: {
-        marginBottom: 12,
-        fontSize: 20,
-        padding: 5,
+        marginBottom: 16,
     },
     dateContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 16,
+    },
+    dateText: {
+        marginLeft: 8,
+        flex: 1,
     },
     switchContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 12
+        marginBottom: 16,
+    },
+    feedingUnitTitle: {
+        marginBottom: 8,
     },
     radioContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginBottom: 12,
+    },
+    buttonContainer: {
+        padding: 16,
     },
     button: {
-        marginTop: 16
-    },
-    labelText: {
-        fontSize: 16,
-    },
-    dateText: {
-        fontSize: 20,
-    },
-    radioLabel: {
-        fontSize: 20,
+        paddingVertical: 8,
     },
     calendarButton: {
         margin: 0,
-    }
+    },
 });
 
 export default SettingsPage;
