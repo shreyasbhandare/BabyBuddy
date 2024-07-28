@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { View, StyleSheet, Animated } from "react-native"
-import { Text, Icon, Button, Snackbar, useTheme } from "react-native-paper"
+import { View, StyleSheet, Animated, SafeAreaView, StatusBar } from "react-native";
+import { Text, Icon, Button, Snackbar, useTheme, Surface, Card } from "react-native-paper";
 
 export default () => {
     const { colors } = useTheme();
@@ -217,160 +217,95 @@ export default () => {
     }
 
     return (
-        <View style={styles.homeContainer}>
-            <View style={[styles.titleContainer, { backgroundColor: colors.primary }]}>
-                <Text variant="headlineSmall" style={styles.iconContainer}>BabyBuddy</Text>
-            </View>
-            <View style={[styles.feedingContainer]}>
-                <View style={styles.sectionTitle}>
-                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Feeding</Text>
-                    <Icon
-                        source="baby-bottle-outline"
-                        size={30}
+        <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle="light-content" backgroundColor={colors.primary} />
+            <Surface style={[styles.header, { backgroundColor: colors.primary }]}>
+                <Text variant="headlineLarge" style={styles.headerText}>BabyBuddy</Text>
+            </Surface>
+            <View style={styles.content}>
+                <Card style={styles.card}>
+                    <Card.Title
+                        title="Feeding"
+                        left={(props) => <Icon {...props} source="baby-bottle-outline" size={30} />}
                     />
-                </View>
-                <View style={styles.feedingActionsContainer}>
-                    <Button mode="contained" onPress={() => updateFeedingCount(-1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        -1
-                    </Button>
-                    <Button mode="contained" onPress={() => updateFeedingCount(-0.5)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        -0.5
-                    </Button>
-                    <View>
-                        <Animated.View style={animatedStyle}>
-                            <Text variant="headlineMedium" style={{
-                                width: 80,
-                                textAlign: 'center',
-                                fontWeight: 'bold'
-                            }}>
-                                {formatCount(feedingCount)}
-                            </Text>
-                        </Animated.View>
-                        <Text style={{
-                            textAlign: 'center',
-                            fontWeight: 'bold'
-                        }}>
-                            {feedingUnit}
-                        </Text>
-                    </View>
-                    <Button mode="contained" onPress={() => updateFeedingCount(0.5)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        +0.5
-                    </Button>
-                    <Button mode="contained" onPress={() => updateFeedingCount(1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        +1
-                    </Button>
-                </View>
-            </View>
-            <View style={[styles.dirtyDiaperContainer]}>
-                <View style={styles.sectionTitle}>
-                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Dirty Diaper</Text>
-                    <Icon
-                        source="emoticon-poop-outline"
-                        size={30}
+                    <Card.Content>
+                        <View style={styles.actionsContainer}>
+                            <Button mode="contained" onPress={() => updateFeedingCount(-1)}>-1</Button>
+                            <Button mode="contained" onPress={() => updateFeedingCount(-0.5)}>-0.5</Button>
+                            <Animated.View style={[styles.countContainer, animatedStyle]}>
+                                <Text variant="headlineMedium" style={styles.countText}>
+                                    {formatCount(feedingCount)}
+                                </Text>
+                                <Text style={styles.unitText}>{feedingUnit}</Text>
+                            </Animated.View>
+                            <Button mode="contained" onPress={() => updateFeedingCount(0.5)}>+0.5</Button>
+                            <Button mode="contained" onPress={() => updateFeedingCount(1)}>+1</Button>
+                        </View>
+                    </Card.Content>
+                </Card>
+
+                <Card style={styles.card}>
+                    <Card.Title
+                        title="Dirty Diaper"
+                        left={(props) => <Icon {...props} source="emoticon-poop-outline" size={30} />}
                     />
-                </View>
-                <View style={styles.poopActionsContainer}>
-                    <Button mode="contained" onPress={() => updatePoopDiaperCount(-1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        -1
-                    </Button>
-                    <Animated.View style={poopAnimatedStyle}>
-                        <Text variant="headlineMedium" style={{
-                            width: 80,
-                            textAlign: 'center',
-                            fontWeight: 'bold'
-                        }}>
-                            {formatCount(poopDiaperCount)}
-                        </Text>
-                    </Animated.View>
-                    <Button mode="contained" onPress={() => updatePoopDiaperCount(1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        +1
-                    </Button>
-                </View>
-            </View>
-            <View style={[styles.wetDiaperContainer]}>
-                <View style={styles.sectionTitle}>
-                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Wet Diaper</Text>
-                    <Icon
-                        source="water-outline"
-                        size={30}
+                    <Card.Content>
+                        <View style={styles.actionsContainer}>
+                            <Button mode="contained" onPress={() => updatePoopDiaperCount(-1)}>-1</Button>
+                            <Animated.View style={[styles.countContainer, poopAnimatedStyle]}>
+                                <Text variant="headlineMedium" style={styles.countText}>
+                                    {formatCount(poopDiaperCount)}
+                                </Text>
+                            </Animated.View>
+                            <Button mode="contained" onPress={() => updatePoopDiaperCount(1)}>+1</Button>
+                        </View>
+                    </Card.Content>
+                </Card>
+
+                <Card style={styles.card}>
+                    <Card.Title
+                        title="Wet Diaper"
+                        left={(props) => <Icon {...props} source="water-outline" size={30} />}
                     />
-                </View>
-                <View style={styles.peeActionsContainer}>
-                    <Button mode="contained" onPress={() => updateWetDiaperCount(-1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        -1
-                    </Button>
-                    <Animated.View style={wetAnimatedStyle}>
-                        <Text variant="headlineMedium" style={{
-                            width: 80,
-                            textAlign: 'center',
-                            fontWeight: 'bold'
-                        }}>
-                            {formatCount(wetDiaperCount)}
-                        </Text>
-                    </Animated.View>
-                    <Button mode="contained" onPress={() => updateWetDiaperCount(1)}
-                        labelStyle={{ fontSize: 20, marginHorizontal: 0 }}
-                        contentStyle={{ width: 50, height: 60, paddingLeft: 10 }} >
-                        +1
-                    </Button>
-                </View>
-            </View>
-            <View style={[styles.sleepContainer]}>
-                <View style={styles.sectionTitle}>
-                    <Text variant="titleLarge" style={{ fontWeight: 600, marginRight: 5 }}>Sleep</Text>
-                    <Icon
-                        source="sleep"
-                        size={30}
+                    <Card.Content>
+                        <View style={styles.actionsContainer}>
+                            <Button mode="contained" onPress={() => updateWetDiaperCount(-1)}>-1</Button>
+                            <Animated.View style={[styles.countContainer, wetAnimatedStyle]}>
+                                <Text variant="headlineMedium" style={styles.countText}>
+                                    {formatCount(wetDiaperCount)}
+                                </Text>
+                            </Animated.View>
+                            <Button mode="contained" onPress={() => updateWetDiaperCount(1)}>+1</Button>
+                        </View>
+                    </Card.Content>
+                </Card>
+
+                <Card style={styles.card}>
+                    <Card.Title
+                        title="Sleep"
+                        left={(props) => <Icon {...props} source="sleep" size={30} />}
                     />
-                </View>
-                <View style={styles.sleepActionsContainer}>
-                    <Button mode="contained" onPress={() => updateSleepCount(-1)}
-                        labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
-                        contentStyle={{ width: 60, height: 60, paddingLeft: 0 }} >
-                        -4Hr
-                    </Button>
-                    <Button mode="contained" onPress={() => updateSleepCount(-0.5)}
-                        labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
-                        contentStyle={{ width: 80, height: 60, paddingLeft: 0 }} >
-                        -30min
-                    </Button>
-                    <Animated.View style={sleepAnimatedStyle}>
-                        <Text variant="headlineMedium" style={{
-                            width: 80,
-                            textAlign: 'center',
-                            fontWeight: 'bold'
-                        }}>
-                            {formatCount(sleepCount)}
-                        </Text>
-                    </Animated.View>
-                    <Button mode="contained" onPress={() => updateSleepCount(0.5)}
-                        labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
-                        contentStyle={{ width: 80, height: 60, paddingLeft: 0 }} >
-                        +30min
-                    </Button>
-                    <Button mode="contained" onPress={() => updateSleepCount(1)}
-                        labelStyle={{ fontSize: 16, marginHorizontal: 0 }}
-                        contentStyle={{ width: 60, height: 60, paddingLeft: 0 }} >
-                        +4Hr
-                    </Button>
-                </View>
-            </View>
-            <View style={styles.syncContainer}>
-                <Button icon="database-sync-outline" mode="contained" onPress={handleSync} style={styles.syncButton} labelStyle={{ fontSize: 18 }}>
+                    <Card.Content>
+                        <View style={styles.actionsContainer}>
+                            <Button mode="contained" onPress={() => updateSleepCount(-4)} labelStyle={{ marginHorizontal: 2 }}>-4Hr</Button>
+                            <Button mode="contained" onPress={() => updateSleepCount(-0.5)} labelStyle={{ marginHorizontal: 2 }}>-30min</Button>
+                            <Animated.View style={[styles.countContainer, sleepAnimatedStyle]}>
+                                <Text variant="headlineMedium" style={styles.countText}>
+                                    {formatCount(sleepCount)}
+                                </Text>
+                            </Animated.View>
+                            <Button mode="contained" onPress={() => updateSleepCount(0.5)} labelStyle={{ marginHorizontal: 2 }}>+30min</Button>
+                            <Button mode="contained" onPress={() => updateSleepCount(4)} labelStyle={{ marginHorizontal: 2 }}>+4Hr</Button>
+                        </View>
+                    </Card.Content>
+                </Card>
+
+                <Button 
+                    mode="contained" 
+                    icon="database-sync-outline" 
+                    onPress={handleSync} 
+                    style={styles.syncButton}
+                >
                     Sync
                 </Button>
             </View>
@@ -384,88 +319,56 @@ export default () => {
                 duration={3000}>
                 {snackbarMessage}
             </Snackbar>
-        </View>
-    )
-}
+        </SafeAreaView>
+    );
+};
 
 const styles = StyleSheet.create({
-    homeContainer: {
+    container: {
         flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        textAlign: 'center',
-        //backgroundColor: '#ccc'
     },
-    titleContainer: {
+    header: {
+        paddingVertical: 16,
+        paddingHorizontal: 24,
+        elevation: 4,
+    },
+    headerText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    content: {
         flex: 1,
-        flexDirection: 'row',
-        paddingLeft: 15
+        padding: 16,
     },
-    iconContainer: {
-        marginTop: 80,
-        fontSize: 48,
-        height: 70,
-        paddingTop: 20,
-        fontWeight: 800,
-        color: '#fff'
+    card: {
+        marginBottom: 16,
+        elevation: 2,
     },
-    feedingContainer: {
-        flex: 1,
-        paddingTop: 20,
-        paddingHorizontal: 15,
-        //backgroundColor: '#b11'
-    },
-    feedingActionsContainer: {
-        flex: 2,
+    actionsContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginTop: 8,
     },
-    dirtyDiaperContainer: {
-        flex: 1,
-        paddingHorizontal: 15,
-        //backgroundColor: '#c11'
-    },
-    poopActionsContainer: {
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'center',
+    countContainer: {
         alignItems: 'center',
-        //backgroundColor: '#ccc',
     },
-    wetDiaperContainer: {
-        flex: 1,
-        paddingHorizontal: 15,
-        //backgroundColor: '#f12'
+    countText: {
+        fontWeight: 'bold',
     },
-    peeActionsContainer: {
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        //backgroundColor: '#ccc',
-    },
-    sleepContainer: {
-        flex: 1,
-        paddingHorizontal: 15,
-        //backgroundColor: '#d33'
-    },
-    sleepActionsContainer: {
-        flex: 2,
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        //backgroundColor: '#ccc',
-    },
-    syncContainer: {
-        marginBottom: 15,
-        paddingHorizontal: 30
-    },
-    sectionTitle: {
-        flex: 1,
-        flexDirection: 'row'
+    unitText: {
+        fontSize: 12,
+        opacity: 0.7,
     },
     syncButton: {
-        marginTop: 16
+        marginTop: 2
     },
-})
+    sleepButtonContent: {
+        height: 30,  // Reduce the height of the button
+        paddingVertical: 0,  // Remove vertical padding
+    },
+    sleepButtonLabel: {
+        fontSize: 12,  // Reduce font size if needed
+        marginHorizontal: 4,  // Reduce horizontal margin
+    },
+});
