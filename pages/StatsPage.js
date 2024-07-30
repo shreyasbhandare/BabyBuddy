@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { SegmentedButtons, Card, Text, useTheme, DataTable } from 'react-native-paper';
+import { View, StyleSheet, SafeAreaView, ScrollView, Dimensions } from 'react-native';
+import { SegmentedButtons, Card, Text, useTheme, DataTable, Surface } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { width } = Dimensions.get('window');
 
 const StatsPage = () => {
     const [timeRange, setTimeRange] = useState('today');
@@ -23,7 +26,7 @@ const StatsPage = () => {
     ];
 
     const statsData = [
-        { title: 'Feedings', icon: 'baby-bottle-outline', value: 6 },
+        { title: 'Feeding', icon: 'baby-bottle-outline', value: 6 },
         { title: 'Wet Diapers', icon: 'water-outline', value: 8 },
         { title: 'Dirty Diapers', icon: 'emoticon-poop-outline', value: 4 },
         { title: 'Sleep', icon: 'sleep', value: '14h' },
@@ -88,56 +91,73 @@ const StatsPage = () => {
     }, [timeRange]);
 
     const renderStatsCard = ({ title, icon, value }) => (
-        <Card style={styles.card} key={title}>
-            <Card.Content style={styles.cardContent}>
-                <MaterialCommunityIcons name={icon} size={24} color={theme.colors.primary} />
+        <Surface style={styles.card} elevation={4} key={title}>
+            <View style={[styles.cardContent, { backgroundColor: theme.colors.primary }]}>
+                <MaterialCommunityIcons name={icon} size={32} color="white" />
                 <Text style={styles.cardTitle}>{title}</Text>
-                <Text style={styles.cardValue}>{value}</Text>
-            </Card.Content>
-        </Card>
+                <View style={styles.valueContainer}>
+                    <Text style={styles.cardValue}>
+                        {title === 'Sleep' ? value.replace('h', '') : value}
+                    </Text>
+                    {(title === 'Feeding' || title === 'Sleep') && (
+                        <Text style={styles.unitText}>
+                            {title === 'Feeding' ? feedingUnit : 'h'}
+                        </Text>
+                    )}
+                </View>
+            </View>
+        </Surface>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.buttonsContainer}>
-                    <SegmentedButtons
-                        value={timeRange}
-                        onValueChange={setTimeRange}
-                        buttons={timeRangeButtons}
-                        style={styles.segmentedButtons}
-                    />
-                    <SegmentedButtons
-                        value={viewType}
-                        onValueChange={setViewType}
-                        buttons={viewTypeButtons}
-                        style={styles.segmentedButtons}
-                    />
-                </View>
-                {viewType === 'overview' ? (
-                    <View style={styles.cardsContainer}>
-                        {statsData.map(renderStatsCard)}
+            <LinearGradient
+                colors={[theme.colors.background, theme.colors.surface]}
+                style={styles.gradient}
+            >
+                <View style={styles.content}>
+                    <Text style={styles.header}>Baby Stats</Text>
+                    <View style={styles.buttonsContainer}>
+                        <SegmentedButtons
+                            value={timeRange}
+                            onValueChange={setTimeRange}
+                            buttons={timeRangeButtons}
+                            style={styles.segmentedButtons}
+                            theme={{ roundness: 10 }}
+                        />
+                        <SegmentedButtons
+                            value={viewType}
+                            onValueChange={setViewType}
+                            buttons={viewTypeButtons}
+                            style={styles.segmentedButtons}
+                            theme={{ roundness: 10 }}
+                        />
                     </View>
-                ) : (
-                    <ScrollView>
-                        <DataTable>
-                            <DataTable.Header>
-                                <DataTable.Title>Date/Time</DataTable.Title>
-                                <DataTable.Title>Activity</DataTable.Title>
-                                <DataTable.Title numeric>Count</DataTable.Title>
-                            </DataTable.Header>
+                    {viewType === 'overview' ? (
+                        <View style={styles.cardsContainer}>
+                            {statsData.map(renderStatsCard)}
+                        </View>
+                    ) : (
+                        <ScrollView style={styles.tableContainer}>
+                            <DataTable>
+                                <DataTable.Header style={styles.tableHeader}>
+                                    <DataTable.Title textStyle={styles.tableHeaderText}>Date/Time</DataTable.Title>
+                                    <DataTable.Title textStyle={styles.tableHeaderText}>Activity</DataTable.Title>
+                                    <DataTable.Title numeric textStyle={styles.tableHeaderText}>Count</DataTable.Title>
+                                </DataTable.Header>
 
-                            {tableData.map((item, index) => (
-                                <DataTable.Row key={index} style={item.isCumulative ? styles.cumulativeRow : null}>
-                                    <DataTable.Cell>{item.date} {item.time}</DataTable.Cell>
-                                    <DataTable.Cell>{item.activity}</DataTable.Cell>
-                                    <DataTable.Cell numeric>{item.count}</DataTable.Cell>
-                                </DataTable.Row>
-                            ))}
-                        </DataTable>
-                    </ScrollView>
-                )}
-            </View>
+                                {tableData.map((item, index) => (
+                                    <DataTable.Row key={index} style={item.isCumulative ? styles.cumulativeRow : styles.tableRow}>
+                                        <DataTable.Cell textStyle={styles.tableCell}>{item.date} {item.time}</DataTable.Cell>
+                                        <DataTable.Cell textStyle={styles.tableCell}>{item.activity}</DataTable.Cell>
+                                        <DataTable.Cell numeric textStyle={styles.tableCell}>{item.count}</DataTable.Cell>
+                                    </DataTable.Row>
+                                ))}
+                            </DataTable>
+                        </ScrollView>
+                    )}
+                </View>
+            </LinearGradient>
         </SafeAreaView>
     );
 };
@@ -145,17 +165,26 @@ const StatsPage = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: 64
+    },
+    gradient: {
+        flex: 1,
     },
     content: {
         flex: 1,
         padding: 16,
     },
-    buttonsContainer: {
+    header: {
+        fontSize: 28,
+        fontWeight: 'bold',
         marginBottom: 16,
+        color: '#333',
+        textAlign: 'center',
+    },
+    buttonsContainer: {
+        marginBottom: 24,
     },
     segmentedButtons: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     cardsContainer: {
         flex: 1,
@@ -164,30 +193,65 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     card: {
-        width: '48%',
-        height: '48%',
+        width: width / 2 - 24,
+        aspectRatio: 1,
         marginBottom: 16,
-        elevation: 4,
-        backgroundColor: 'white',
+        borderRadius: 16,
+        overflow: 'hidden',
     },
     cardContent: {
         flex: 1,
         alignItems: 'center',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
         padding: 16,
     },
     cardTitle: {
-        fontSize: 14,
+        fontSize: 16,
+        fontWeight: '600',
         textAlign: 'center',
-        color: 'black',
+        color: 'white',
+        marginBottom: 8,
+    },
+    valueContainer: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'center',
     },
     cardValue: {
-        fontSize: 32,
+        fontSize: 42,
         fontWeight: 'bold',
-        color: '#007AFF',
+        color: 'white',
+    },
+    unitText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: 'white',
+        marginLeft: 4,
+    },
+    tableContainer: {
+        flex: 1,
+        backgroundColor: 'white',
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    tableHeader: {
+        backgroundColor: '#f0f0f0',
+    },
+    tableHeaderText: {
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    tableRow: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
     },
     cumulativeRow: {
         backgroundColor: '#e6f7ff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#b3e0ff',
+    },
+    tableCell: {
+        color: '#333',
     },
 });
 
